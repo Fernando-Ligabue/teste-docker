@@ -14,15 +14,11 @@ export default async function Home() {
     <div className="font-sans grid grid-rows-[20px_1fr_20px] min-h-screen pb-20 gap-16">
       <main className="flex flex-col gap-32">
         <section
-          className="w-full min-h-[75vh] flex flex-col items-center justify-center gap-8 bg-cyan-200"
-          // style={{
-          //   backgroundImage: imageUrl ? `url('${imageUrl}')` : 'none',
-          //   backgroundSize: 'cover',
-          //   backgroundPosition: 'center',
-          // }}
-        >
+          className="w-full min-h-[75vh] flex flex-col items-center justify-center gap-8 bg-cyan-200">
           <h1 className="text-5xl text-black">{title}</h1>
           <p className="text-5xl text-white">{description}</p>
+                    <p className="text-2xl text-black">Aqui esta uma alteração para testes no docker</p>
+
         </section>
 
         <section className="w-full h-screen flex flex-col items-center justify-center gap-8">

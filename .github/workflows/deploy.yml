@@ -20,7 +20,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build da imagem Docker
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/meu-next-app:latest .
+        run: docker build -t fernandoligabue/tm2awebsite:latest .
 
-      - name: Push para o Docker Hub
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/meu-next-app:latest
+      - name: Push da imagem para o Docker Hub
+        run: docker push fernandoligabue/tm2awebsite:latest
