@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build, Push, and Test SSH Pull
 
 on:
   push:
@@ -24,3 +24,15 @@ jobs:
 
       - name: Push da imagem para o Docker Hub
         run: docker push fernandoligabue/tm2awebsite:latest
+
+      - name: Testar Docker Pull no Servidor via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "--- A tentar fazer docker pull no servidor ---"
+            docker pull fernandoligabue/tm2awebsite:latest
+            echo "--- Verificando imagens no servidor ---"
+            docker images | grep fernandoligabue/tm2awebsite
