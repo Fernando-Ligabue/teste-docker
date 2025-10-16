@@ -1,4 +1,4 @@
-name: Build, Push, and Test SSH Pull
+name: Build, Push and Deploy to Plesk
 
 on:
   push:
@@ -6,9 +6,8 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  build-push-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout do código
         uses: actions/checkout@v3
@@ -19,20 +18,31 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build da imagem Docker
-        run: docker build -t fernandoligabue/tm2awebsite:latest .
+      - name: Build e Push para o Docker Hub
+        run: |
+          docker build -t fernandoligabue/tm2awebsite:latest .
+          docker push fernandoligabue/tm2awebsite:latest
 
-      - name: Push da imagem para o Docker Hub
-        run: docker push fernandoligabue/tm2awebsite:latest
-
-      - name: Testar Docker Pull no Servidor via SSH
+      - name: Deploy no Servidor Plesk via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo "--- A tentar fazer docker pull no servidor ---"
+            # 1. Faz o pull da imagem mais recente do Docker Hub
             docker pull fernandoligabue/tm2awebsite:latest
-            echo "--- Verificando imagens no servidor ---"
-            docker images | grep fernandoligabue/tm2awebsite
+
+            # 2. Para e remove o contentor antigo, se ele existir
+            #    (O nome do contentor está no secret 'CONTAINER_NAME')
+            if [ $(docker ps -q -f name=${{ secrets.CONTAINER_NAME }}) ]; then
+              docker stop ${{ secrets.CONTAINER_NAME }}
+              docker rm ${{ secrets.CONTAINER_NAME }}
+            fi
+
+            # 3. Inicia o novo contentor com a nova imagem
+            #    ATENÇÃO: Personalize este comando com as suas portas e variáveis de ambiente!
+            #    Exemplo para a app Next.js (porta 3000):
+            docker run -d --name ${{ secrets.CONTAINER_NAME }} \
+              -p 3111:3000 \
+              fernandoligabue/tm2awebsite:latest
